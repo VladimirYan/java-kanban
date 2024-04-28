@@ -30,16 +30,23 @@ class TaskManager {
         return task;
     }
 
-    // Метод для вывода всех задач
-    public void printAllTasks() {
-        if (tasks.isEmpty()) {
-            System.out.println("Список задач пуст.");
-        } else {
-            System.out.println("Список задач:");
-            for (Task task : tasks.values()) {
-                System.out.println(task);
-            }
+    // Метод для получения всех задач
+    public List<Task> getAllTasks() {
+        return new ArrayList<>(tasks.values());
+    }
+
+    // Метод для получения всех эпиков
+    public List<Epic> getAllEpics() {
+        return new ArrayList<>(epics.values());
+    }
+
+    // Метод для получения всех подзадач
+    public List<Task> getAllSubTasks() {
+        List<Task> allSubTasks = new ArrayList<>();
+        for (List<Task> subTasks : epicSubTasks.values()) {
+            allSubTasks.addAll(subTasks);
         }
+        return allSubTasks;
     }
 
     // Метод для создания эпика

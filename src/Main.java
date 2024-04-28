@@ -1,5 +1,6 @@
 import java.util.Scanner;
 import java.util.Map;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
@@ -17,32 +18,33 @@ public class Main {
                     createTask(taskManager, scanner);
                     break;
                 case 2:
-                    taskManager.printAllTasks();
-                    break;
-                case 3:
                     removeTask(taskManager, scanner);
                     break;
-                case 4:
+                case 3:
                     updateTaskStatus(taskManager, scanner);
                     break;
-                case 5:
+                case 4:
                     createEpic(taskManager, scanner);
                     break;
-                case 6:
+                case 5:
                     createSubTask(taskManager, scanner);
                     break;
-                case 7:
+                case 6:
                     getAllSubTasksForEpic(taskManager, scanner);
                     break;
-                case 8:
+                case 7:
                     updateSubTaskStatus(taskManager, scanner);
                     break;
-                case 9:
+                case 8:
                     removeEpic(taskManager, scanner);
                     break;
-                case 10:
+                case 9:
                     removeSubTask(taskManager, scanner);
                     break;
+                case 10:
+                    printAll(taskManager, scanner);
+                    break;
+
                 case 11:
                     removeAll(taskManager, scanner);
                     break;
@@ -61,15 +63,15 @@ public class Main {
     private static void printMenu() {
         System.out.println("\nВыберите действие:");
         System.out.println("1. Создать задачу.");
-        System.out.println("2. Вывести все задачи.");
-        System.out.println("3. Удалить задачу.");
-        System.out.println("4. Обновить статус задачи.");
-        System.out.println("5. Создать эпик.");
-        System.out.println("6. Создать подзадачу.");
-        System.out.println("7. Посмотреть все подзадачи для эпика.");
-        System.out.println("8. Обновить статус подзадачи.");
-        System.out.println("9. Удалить  эпик.");
-        System.out.println("10. Удалить подзадачу.");
+        System.out.println("2. Удалить задачу.");
+        System.out.println("3. Обновить статус задачи.");
+        System.out.println("4. Создать эпик.");
+        System.out.println("5. Создать подзадачу.");
+        System.out.println("6. Посмотреть все подзадачи для эпика.");
+        System.out.println("7. Обновить статус подзадачи.");
+        System.out.println("8. Удалить  эпик.");
+        System.out.println("9. Удалить подзадачу.");
+        System.out.println("10. Вывести всё (задачи/эпики/подзадачи).");
         System.out.println("11. Удалить всё (задачи/эпики/подзадачи).");
         System.out.println("12. Выйти из приложения.");
     }
@@ -182,6 +184,45 @@ public class Main {
             taskManager.removeAllEpics();
         } else if (number == 3) {
             taskManager.removeAllSubTasks();
+        } else {
+            System.out.println("Введен некорректный номер!");
+        }
+    }
+
+    private static void printAll(TaskManager taskManager, Scanner scanner) {
+        System.out.println("Выберите, что Вы хотите вывести:");
+        System.out.println("Для вывода введите номер: \n1. Задачи \n2. Эпики \n3. Подзадачи");
+        int print = scanner.nextInt();
+        if (print == 1) {
+            List<Task> allTasks = taskManager.getAllTasks();
+            if (allTasks.isEmpty()) {
+                System.out.println("Список задач пуст.");
+            } else {
+                System.out.println("Список задач:");
+                for (Task task : allTasks) {
+                    System.out.println(task);
+                }
+            }
+        } else if (print == 2) {
+            List<Epic> allEpics = taskManager.getAllEpics();
+            if (allEpics.isEmpty()) {
+                System.out.println("Список эпиков пуст.");
+            } else {
+                System.out.println("Список эпиков:");
+                for (Epic epic : allEpics) {
+                    System.out.println(epic);
+                }
+            }
+        } else if (print == 3) {
+            List<Task> allSubTasks = taskManager.getAllSubTasks();
+            if (allSubTasks.isEmpty()) {
+                System.out.println("Список подзадач пуст.");
+            } else {
+                System.out.println("Список подзадач:");
+                for (Task subTask : allSubTasks) {
+                    System.out.println(subTask);
+                }
+            }
         } else {
             System.out.println("Введен некорректный номер!");
         }
