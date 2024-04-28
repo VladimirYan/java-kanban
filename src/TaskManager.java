@@ -19,9 +19,9 @@ class TaskManager {
         this.scanner = new Scanner(System.in);
     }
 
-    // Метод для создания задачи
-    public Task createTask(String name, TaskStatus status) {
-        Task task = new Task(taskIdCounter++, name, status);
+    //Метод для создания задачи
+    public Task createTask(Task task) {
+        task.setId(taskIdCounter++);
         tasks.put(task.getId(), task);
         return task;
     }

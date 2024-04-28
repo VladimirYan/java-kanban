@@ -75,8 +75,13 @@ public class Main {
     private static void createTask(TaskManager taskManager, Scanner scanner) {
         System.out.println("Введите название задачи:");
         String taskName = scanner.nextLine();
-        Task newTask = taskManager.createTask(taskName, TaskStatus.NEW);
-        System.out.println("Успешно создана новая задача: " + newTask);
+        System.out.println("Введите статус задачи (NEW, IN_PROGRESS, DONE):");
+        TaskStatus taskStatus = TaskStatus.valueOf(scanner.nextLine().toUpperCase());
+
+        Task newTask = new Task(0, taskName, taskStatus);
+        Task createdTask = taskManager.createTask(newTask);
+
+        System.out.println("Успешно создана новая задача: " + createdTask);
     }
 
     private static void createEpic(TaskManager taskManager, Scanner scanner) {

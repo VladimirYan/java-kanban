@@ -1,5 +1,5 @@
 class Task {
-    private final int id;
+    private int id;
     private final String name;
     private TaskStatus status;
 
@@ -27,6 +27,11 @@ class Task {
     public void setStatus(TaskStatus status) {
 
         this.status = status;
+    }
+
+    public void setId(int id) {
+
+        this.id = id;
     }
 
     @Override
