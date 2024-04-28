@@ -1,3 +1,11 @@
+package main;
+
+import taskmanager.TaskManager;
+import tasks.Task;
+import tasks.Epic;
+import tasks.SubTask;
+import tasks.TaskStatus;
+
 import java.util.Scanner;
 import java.util.Map;
 import java.util.List;
@@ -44,7 +52,6 @@ public class Main {
                 case 10:
                     printAll(taskManager, scanner);
                     break;
-
                 case 11:
                     removeAll(taskManager, scanner);
                     break;

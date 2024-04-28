@@ -1,10 +1,17 @@
+package taskmanager;
+
+import tasks.Epic;
+import tasks.SubTask;
+import tasks.Task;
+import tasks.TaskStatus;
+
 import java.util.Scanner;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 
-class TaskManager {
+public class TaskManager {
     private int taskIdCounter;
     private final Map<Integer, Task> tasks;
     private final Map<Integer, Epic> epics;

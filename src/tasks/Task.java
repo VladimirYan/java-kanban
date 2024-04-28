@@ -1,4 +1,6 @@
-class Task {
+package tasks;
+
+public class Task {
     private int id;
     private final String name;
     private TaskStatus status;
