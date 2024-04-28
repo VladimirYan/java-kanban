@@ -44,6 +44,9 @@ public class Main {
                     removeSubTask(taskManager, scanner);
                     break;
                 case 11:
+                    removeAll(taskManager, scanner);
+                    break;
+                case 12:
                     running = false;
                     break;
                 default:
@@ -67,7 +70,8 @@ public class Main {
         System.out.println("8. Обновить статус подзадачи.");
         System.out.println("9. Удалить  эпик.");
         System.out.println("10. Удалить подзадачу.");
-        System.out.println("11. Выйти из приложения.");
+        System.out.println("11. Удалить всё (задачи/эпики/подзадачи).");
+        System.out.println("12. Выйти из приложения.");
     }
 
     private static int getUserChoice(Scanner scanner) {
@@ -166,5 +170,20 @@ public class Main {
         int subTaskIdToDelete = scanner.nextInt();
         scanner.nextLine();
         taskManager.removeSubTask(subTaskIdToDelete);
+    }
+
+    private static void removeAll(TaskManager taskManager, Scanner scanner) {
+        System.out.println("Выберите, что Вы хотите удалить:");
+        System.out.println("Введите номер: \n1. Задачи \n2. Эпики \n3. Подзадачи");
+        int number = scanner.nextInt();
+        if (number == 1) {
+            taskManager.removeAllTasks();
+        } else if (number == 2) {
+            taskManager.removeAllEpics();
+        } else if (number == 3) {
+            taskManager.removeAllSubTasks();
+        } else {
+            System.out.println("Введен некорректный номер!");
+        }
     }
 }

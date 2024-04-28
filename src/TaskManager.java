@@ -132,4 +132,26 @@ class TaskManager {
         }
         System.out.println("Подзадача с ID " + subTaskId + " не найдена.");
     }
+
+    // Метод для удаления всех задач
+    public void removeAllTasks() {
+        tasks.clear();
+        System.out.println("Все задачи удалены.");
+    }
+
+    // Метод для удаления всех эпиков
+    public void removeAllEpics() {
+        epics.clear();
+        epicSubTasks.clear();
+        System.out.println("Все эпики удалены.");
+    }
+
+    // Метод для удаления всех подзадач
+    public void removeAllSubTasks() {
+        for (Epic epic : epics.values()) {
+            epic.getSubTasks().clear();
+        }
+        epicSubTasks.clear();
+        System.out.println("Все подзадачи удалены.");
+    }
 }
