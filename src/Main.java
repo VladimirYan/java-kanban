@@ -1,4 +1,5 @@
 import java.util.Scanner;
+import java.util.Map;
 
 public class Main {
     public static void main(String[] args) {
@@ -37,9 +38,12 @@ public class Main {
                     updateSubTaskStatus(taskManager, scanner);
                     break;
                 case 9:
-                    removeSubTask(taskManager, scanner);
+                    removeEpic(taskManager, scanner);
                     break;
                 case 10:
+                    removeSubTask(taskManager, scanner);
+                    break;
+                case 11:
                     running = false;
                     break;
                 default:
@@ -47,7 +51,7 @@ public class Main {
                     break;
             }
         }
-        taskManager.exit();
+        System.out.println("Программа завершена.");
         scanner.close();
     }
 
@@ -61,8 +65,9 @@ public class Main {
         System.out.println("6. Создать подзадачу.");
         System.out.println("7. Посмотреть все подзадачи для эпика.");
         System.out.println("8. Обновить статус подзадачи.");
-        System.out.println("9. Удалить подзадачу.");
-        System.out.println("10. Выйти из приложения.");
+        System.out.println("9. Удалить  эпик.");
+        System.out.println("10. Удалить подзадачу.");
+        System.out.println("11. Выйти из приложения.");
     }
 
     private static int getUserChoice(Scanner scanner) {
@@ -92,6 +97,10 @@ public class Main {
     }
 
     private static void createSubTask(TaskManager taskManager, Scanner scanner) {
+        System.out.println("Существующие эпики:");
+        for (Map.Entry<Integer, Epic> entry : taskManager.getEpics().entrySet()) {
+            System.out.println("ID: " + entry.getKey() + ", Название: " + entry.getValue().getName());
+        }
         System.out.println("Введите название подзадачи:");
         String subTaskName = scanner.nextLine();
         System.out.println("Введите ID эпика:");
@@ -104,6 +113,10 @@ public class Main {
     }
 
     private static void getAllSubTasksForEpic(TaskManager taskManager, Scanner scanner) {
+        System.out.println("Существующие эпики:");
+        for (Map.Entry<Integer, Epic> entry : taskManager.getEpics().entrySet()) {
+            System.out.println("ID: " + entry.getKey() + ", Название: " + entry.getValue().getName());
+        }
         System.out.println("Введите ID эпика:");
         int epicIdForSubTasks = scanner.nextInt();
         System.out.println("Подзадачи для эпика с ID " + epicIdForSubTasks + ":");
@@ -135,6 +148,17 @@ public class Main {
         System.out.println("Введите новый статус (NEW, IN_PROGRESS, DONE):");
         TaskStatus newStatus = TaskStatus.valueOf(scanner.nextLine().toUpperCase());
         taskManager.updateSubTaskStatus(subTaskId, newStatus);
+    }
+
+    private static void removeEpic(TaskManager taskManager, Scanner scanner) {
+        System.out.println("Существующие эпики:");
+        for (Map.Entry<Integer, Epic> entry : taskManager.getEpics().entrySet()) {
+            System.out.println("ID: " + entry.getKey() + ", Название: " + entry.getValue().getName());
+        }
+        System.out.println("Введите ID эпика, который нужно удалить:");
+        int epicIdToDelete = scanner.nextInt();
+        scanner.nextLine();
+        taskManager.removeEpic(epicIdToDelete);
     }
 
     private static void removeSubTask(TaskManager taskManager, Scanner scanner) {

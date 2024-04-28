@@ -9,7 +9,7 @@ class TaskManager {
     private final Map<Integer, Task> tasks;
     private final Map<Integer, Epic> epics;
     private final Map<Integer, List<Task>> epicSubTasks;
-    private final Scanner scanner;
+    final Scanner scanner;
 
     public TaskManager() {
         this.taskIdCounter = 1;
@@ -17,6 +17,10 @@ class TaskManager {
         this.epics = new HashMap<>();
         this.epicSubTasks = new HashMap<>();
         this.scanner = new Scanner(System.in);
+    }
+
+    public Map<Integer, Epic> getEpics() {
+        return epics;
     }
 
     //Метод для создания задачи
@@ -103,6 +107,17 @@ class TaskManager {
         System.out.println("Подзадача с ID " + subTaskId + " не найдена.");
     }
 
+    // Метод для удаления эпика
+    public void removeEpic(int epicId) {
+        if (epics.containsKey(epicId)) {
+            epics.remove(epicId);
+            epicSubTasks.remove(epicId);
+            System.out.println("Эпик с ID " + epicId + " удален.");
+        } else {
+            System.out.println("Эпик с ID " + epicId + " не найден.");
+        }
+    }
+
     // Метод для удаления подзадачи
     public void removeSubTask(int subTaskId) {
         for (Epic epic : epics.values()) {
@@ -116,11 +131,5 @@ class TaskManager {
             }
         }
         System.out.println("Подзадача с ID " + subTaskId + " не найдена.");
-    }
-
-    //Выход из приложения
-    public void exit() {
-        scanner.close();
-        System.out.println("Программа завершена.");
     }
 }
