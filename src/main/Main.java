@@ -105,8 +105,9 @@ public class Main {
     private static void createEpic(TaskManager taskManager, Scanner scanner) {
         System.out.println("Введите название эпика:");
         String epicName = scanner.nextLine();
-        Epic newEpic = taskManager.createEpic(epicName, TaskStatus.NEW);
-        System.out.println("Создан новый эпик: " + newEpic);
+        Epic newEpic = new Epic(0, epicName, TaskStatus.NEW);
+        Epic createdEpic = taskManager.createEpic(newEpic);
+        System.out.println("Создан новый эпик: " + createdEpic);
     }
 
     private static void createSubTask(TaskManager taskManager, Scanner scanner) {
@@ -119,9 +120,10 @@ public class Main {
         System.out.println("Введите ID эпика:");
         int epicId = scanner.nextInt();
         scanner.nextLine();
-        SubTask newSubTask = taskManager.createSubTask(subTaskName, TaskStatus.NEW, epicId);
-        if (newSubTask != null) {
-            System.out.println("Создана новая подзадача: " + newSubTask);
+        SubTask newSubTask = new SubTask(0, subTaskName, TaskStatus.NEW, epicId);
+        SubTask createdSubTask = taskManager.createSubTask(newSubTask);
+        if (createdSubTask != null) {
+            System.out.println("Создана новая подзадача: " + createdSubTask);
         }
     }
 
