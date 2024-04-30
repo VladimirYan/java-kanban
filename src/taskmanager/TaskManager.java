@@ -126,8 +126,13 @@ public class TaskManager {
     // Метод для удаления эпика
     public void removeEpic(int epicId) {
         if (epics.containsKey(epicId)) {
+            Epic epicToRemove = epics.get(epicId);
             epics.remove(epicId);
-            subTasks.remove(epicId);
+            for (Task subTask : epicToRemove.getSubTasks()) {
+                subTasks.remove(subTask.getId());
+            }
+            epicToRemove.clearSubTasks();
+
             System.out.println("Эпик с ID " + epicId + " удален.");
         } else {
             System.out.println("Эпик с ID " + epicId + " не найден.");
