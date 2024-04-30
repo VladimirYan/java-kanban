@@ -15,7 +15,7 @@ public class TaskManager {
     private int taskIdCounter;
     private final Map<Integer, Task> tasks;
     private final Map<Integer, Epic> epics;
-    private final Map<Integer, List<Task>> subTasks;
+    private final HashMap<Integer, SubTask> subTasks;
     final Scanner scanner;
 
     public TaskManager() {
@@ -51,12 +51,8 @@ public class TaskManager {
     }
 
     // Метод для получения всех подзадач
-    public List<Task> getAllSubTasks() {
-        List<Task> allSubTasks = new ArrayList<>();
-        for (List<Task> subTasks : subTasks.values()) {
-            allSubTasks.addAll(subTasks);
-        }
-        return allSubTasks;
+    public List<SubTask> getAllSubTasks() {
+        return new ArrayList<>(subTasks.values());
     }
 
     // Метод для создания эпика
@@ -82,10 +78,7 @@ public class TaskManager {
         if (epic != null) {
             subTask.setId(taskIdCounter++);
             epic.addSubTask(subTask);
-            if (!subTasks.containsKey(subTask.getEpicId())) {
-                subTasks.put(subTask.getEpicId(), new ArrayList<>());
-            }
-            subTasks.get(subTask.getEpicId()).add(subTask);
+            subTasks.put(subTask.getId(), subTask);
             return subTask;
         } else {
             System.out.println("Эпик с ID " + subTask.getEpicId() + " не найден.");
@@ -94,9 +87,18 @@ public class TaskManager {
     }
 
     // Метод для получения всех подзадач определенного эпика
-    public List<Task> getAllSubTasksForEpic(int epicId) {
-
-        return subTasks.getOrDefault(epicId, new ArrayList<>());
+    public List<SubTask> getAllSubTasksForEpic(int epicId) {
+        List<SubTask> result = new ArrayList<>();
+        for (Epic epic : epics.values()) {
+            for (Task subTask : epic.getSubTasks()) {
+                if (subTask instanceof SubTask castedSubTask) {
+                    if (castedSubTask.getEpicId() == epicId) {
+                        result.add(castedSubTask);
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     //Метод для обновления статуса задачи (обычной)
@@ -112,16 +114,13 @@ public class TaskManager {
 
     // Метод для обновления статуса подзадачи
     public void updateSubTaskStatus(int subTaskId, TaskStatus newStatus) {
-        for (Epic epic : epics.values()) {
-            for (Task subTask : epic.getSubTasks()) {
-                if (subTask.getId() == subTaskId) {
-                    subTask.setStatus(newStatus);
-                    System.out.println("Статус подзадачи с ID " + subTaskId + " успешно обновлен.");
-                    return;
-                }
-            }
+        if (subTasks.containsKey(subTaskId)) {
+            SubTask subTask = subTasks.get(subTaskId);
+            subTask.setStatus(newStatus);
+            System.out.println("Статус подзадачи с ID " + subTaskId + " успешно обновлен.");
+        } else {
+            System.out.println("Подзадача с ID " + subTaskId + " не найдена.");
         }
-        System.out.println("Подзадача с ID " + subTaskId + " не найдена.");
     }
 
     // Метод для удаления эпика
@@ -135,19 +134,21 @@ public class TaskManager {
         }
     }
 
-    // Метод для удаления подзадачи
+    //Метод для удаления определённой подзадачи по ID
     public void removeSubTask(int subTaskId) {
-        for (Epic epic : epics.values()) {
-            for (Task subTask : epic.getSubTasks()) {
-                if (subTask.getId() == subTaskId) {
-                    epic.getSubTasks().remove(subTask);
-                    subTasks.get(epic.getId()).remove(subTask);
-                    System.out.println("Подзадача с ID " + subTaskId + " удалена.");
-                    return;
+        if (subTasks.containsKey(subTaskId)) {
+            SubTask subTaskToRemove = subTasks.get(subTaskId);
+            subTasks.remove(subTaskId);
+            for (Epic epic : epics.values()) {
+                if (epic.getSubTasks().contains(subTaskToRemove)) {
+                    epic.getSubTasks().remove(subTaskToRemove);
+                    break;
                 }
             }
+            System.out.println("Подзадача с ID " + subTaskId + " удалена.");
+        } else {
+            System.out.println("Подзадача с ID " + subTaskId + " не найдена.");
         }
-        System.out.println("Подзадача с ID " + subTaskId + " не найдена.");
     }
 
     // Метод для удаления всех задач

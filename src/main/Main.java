@@ -223,7 +223,7 @@ public class Main {
                 }
             }
         } else if (print == 3) {
-            List<Task> allSubTasks = taskManager.getAllSubTasks();
+            List<SubTask> allSubTasks = taskManager.getAllSubTasks();
             if (allSubTasks.isEmpty()) {
                 System.out.println("Список подзадач пуст.");
             } else {
