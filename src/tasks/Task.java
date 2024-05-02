@@ -1,9 +1,9 @@
 package tasks;
 
 public class Task {
-    private int id;
-    private final String name;
-    private TaskStatus status;
+    protected int id;
+    protected String name;
+    protected TaskStatus status;
 
     public Task(int id, String name, TaskStatus status) {
         this.id = id;
@@ -14,6 +14,11 @@ public class Task {
     public int getId() {
 
         return id;
+    }
+
+    public void setId(int id) {
+
+        this.id = id;
     }
 
     public String getName() {
@@ -31,16 +36,9 @@ public class Task {
         this.status = status;
     }
 
-    public void setId(int id) {
-
-        this.id = id;
-    }
-
     @Override
     public String toString() {
-        return " " + name +
-                " под номером ID " + id +
-                "\nСтатус: " + status;
 
+        return String.format("Название='%s', ID=%d, Статус='%s'", name, id, status);
     }
 }
