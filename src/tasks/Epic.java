@@ -4,36 +4,58 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Epic extends Task {
-    private List<SubTask> subTasks = new ArrayList<>();
+    private final List<SubTask> subTasks = new ArrayList<>();
 
-    public Epic(int id, String name, TaskStatus status) {
-        super(id, name, status);
+    public Epic(int id, String name) {
+        super(id, name);
+        this.status = TaskStatus.NEW;
     }
 
-    //Метод автоматически обновляет статус эпика в зависимости от статусов подзадач
-    public TaskStatus calculateStatus() {
-        boolean allDone = subTasks.stream().allMatch(subtask -> subtask.getStatus() == TaskStatus.DONE);
-        boolean anyInProgress = subTasks.stream().anyMatch(subtask -> subtask.getStatus() == TaskStatus.IN_PROGRESS);
-        boolean anyNotNew = subTasks.stream().anyMatch(subtask -> subtask.getStatus() != TaskStatus.NEW);
-
-        if (allDone) return TaskStatus.DONE;
-        if (anyInProgress) return TaskStatus.IN_PROGRESS;
-        if (anyNotNew) return TaskStatus.IN_PROGRESS;
-        return TaskStatus.NEW;
-    }
-
-    public void addSubtask(SubTask subtask) {
-        subTasks.add(subtask);
+    public void addSubTask(SubTask subTask) {
+        if (subTask.getId() == getId()) {
+            throw new IllegalArgumentException("A subtask cannot be its own epic");
+        }
+        subTasks.add(subTask);
         this.status = calculateStatus();
+    }
+
+    //Обновление статуса эпика
+    public TaskStatus calculateStatus() {
+        if (subTasks.isEmpty()) {
+            return TaskStatus.NEW;
+        }
+
+        boolean allDone = true;
+        boolean anyInProgressOrDone = false;
+
+        for (SubTask subTask : subTasks) {
+            TaskStatus status = subTask.getStatus();
+
+            if (status == TaskStatus.IN_PROGRESS || status == TaskStatus.DONE) {
+                anyInProgressOrDone = true;
+            }
+            if (status != TaskStatus.DONE) {
+                allDone = false;
+            }
+        }
+
+        if (allDone) {
+            return TaskStatus.DONE;
+        }
+        if (anyInProgressOrDone) {
+            return TaskStatus.IN_PROGRESS;
+        }
+
+        return TaskStatus.NEW;
     }
 
     public List<SubTask> getSubTasks() {
 
-        return subTasks;
+        return new ArrayList<>(subTasks);
     }
 
-    public void setSubTasks(List<SubTask> subTasks) {
-        this.subTasks = subTasks;
+    public void removeSubTask(SubTask subTask) {
+        subTasks.remove(subTask);
         this.status = calculateStatus();
     }
 }
