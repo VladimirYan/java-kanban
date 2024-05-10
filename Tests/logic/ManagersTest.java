@@ -1,4 +1,4 @@
-package Logic;
+package logic;
 
 import org.junit.jupiter.api.Test;
 

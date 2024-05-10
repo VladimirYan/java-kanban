@@ -1,4 +1,4 @@
-package Logic;
+package logic;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -156,6 +156,10 @@ class InMemoryTaskManagerTest {
         assertNull(taskManager.getTask(addedTask.getId()));
         assertFalse(taskManager.getHistory().contains(addedTask));
     }
+
+    //тесты для deleteEpicById(int id) и deleteSubTaskById(int id)
+    //тесты для deleteAll(Tasks, Epics, SubTasks)
+    //прочие тесты (для обработки конкретных сценариев)
 
     @Test
     void getEpicSubtasks_ShouldReturnListOfSubTasksForEpic() {

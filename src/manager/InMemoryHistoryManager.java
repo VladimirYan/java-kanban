@@ -16,6 +16,9 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void add(Task task) {
+        if (task == null) {
+            throw new IllegalArgumentException("Task cannot be null");
+        }
         if (history.size() == 10) {
             history.removeFirst();
         }

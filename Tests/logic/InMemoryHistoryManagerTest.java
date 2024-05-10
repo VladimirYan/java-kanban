@@ -1,4 +1,4 @@
-package Logic;
+package logic;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -44,5 +44,12 @@ class InMemoryHistoryManagerTest {
         historyManager.add(newTask);
         assertFalse(historyManager.getHistory().contains(new Task(1, "Test Task 1")));
         assertTrue(historyManager.getHistory().contains(newTask));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenAddingNullTask() {
+        HistoryManager historyManager = new InMemoryHistoryManager();
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> historyManager.add(null));
+        assertEquals("Task cannot be null", exception.getMessage());
     }
 }
