@@ -24,7 +24,7 @@ public class InMemoryTaskManager implements TaskManager {
         this.historyManager = historyManager;
     }
 
-    private int generateId () {
+    public int generateId() {
 
         return taskIdCounter++;
     }
@@ -98,7 +98,8 @@ public class InMemoryTaskManager implements TaskManager {
             return null;
         }
         historyManager.add(originalTask);
-        return new Task(originalTask.getId(), originalTask.getName());
+        return new Task(originalTask.getId(),
+                originalTask.getName());
     }
 
     @Override
@@ -108,7 +109,8 @@ public class InMemoryTaskManager implements TaskManager {
             return null;
         }
         historyManager.add(originalEpic);
-        return new Epic(originalEpic.getId(), originalEpic.getName());
+        return new Epic(originalEpic.getId(),
+                originalEpic.getName());
     }
 
     @Override
@@ -118,7 +120,9 @@ public class InMemoryTaskManager implements TaskManager {
             return null;
         }
         historyManager.add(originalSubTask);
-        return new SubTask(originalSubTask.getId(), originalSubTask.getName(), originalSubTask.getEpicId());
+        return new SubTask(originalSubTask.getId(),
+                originalSubTask.getName(),
+                originalSubTask.getEpicId());
     }
 
     @Override
