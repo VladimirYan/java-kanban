@@ -1,17 +1,24 @@
 package manager;
 
-import tasks.Task;
-import java.util.LinkedList;
-import java.util.List;
+import tasks.*;
 
+
+import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private final List<Task> history = new LinkedList<>();
+    private final Map<Integer, Node> historyMap = new HashMap<>();
+    private Node head;
+    private Node tail;
 
     @Override
     public List<Task> getHistory() {
-
-        return new LinkedList<>(history);
+        List<Task> historyList = new ArrayList<>();
+        Node currentNode = head;
+        while (currentNode != null) {
+            historyList.add(currentNode.task);
+            currentNode = currentNode.next;
+        }
+        return historyList;
     }
 
     @Override
@@ -19,15 +26,47 @@ public class InMemoryHistoryManager implements HistoryManager {
         if (task == null) {
             throw new IllegalArgumentException("Task cannot be null");
         }
-        if (history.size() == 10) {
-            history.removeFirst();
+
+        remove(task.getId());
+
+        Node newNode = new Node(tail, task, null);
+        if (tail != null) {
+            tail.next = newNode;
         }
-        history.add(task);
+        tail = newNode;
+        if (head == null) {
+            head = newNode;
+        }
+
+        historyMap.put(task.getId(), newNode);
     }
 
     @Override
     public void remove(int id) {
+        Node nodeToRemove = historyMap.get(id);
+        if (nodeToRemove != null) {
+            Task taskToRemove = nodeToRemove.task;
+            if (taskToRemove instanceof Epic epic) {
+                for (SubTask subtask : epic.getSubTasks()) {
+                    remove(subtask.getId());
+                }
+            }
+            removeNode(nodeToRemove);
+            historyMap.remove(id);
+        }
+    }
 
-        history.removeIf(t -> t.getId() == id);
+    private void removeNode(Node node) {
+        if (node.prev != null) {
+            node.prev.next = node.next;
+        } else {
+            head = node.next;
+        }
+
+        if (node.next != null) {
+            node.next.prev = node.prev;
+        } else {
+            tail = node.prev;
+        }
     }
 }
