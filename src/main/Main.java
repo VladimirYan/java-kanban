@@ -9,6 +9,7 @@ import java.nio.file.Path;
 
 public class Main {
     public static void main(String[] args) throws IOException {
+        //Тест
         // Создание временного файла для сценария
         Path tempFile = Files.createTempFile("user-scenario", ".csv");
 
