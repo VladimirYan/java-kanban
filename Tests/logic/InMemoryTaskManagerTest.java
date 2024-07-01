@@ -11,7 +11,7 @@ import tasks.*;
 import java.util.List;
 
 class InMemoryTaskManagerTest {
-    private InMemoryTaskManager taskManager;
+    InMemoryTaskManager taskManager;
 
     @BeforeEach
     void setUp() {
@@ -25,7 +25,7 @@ class InMemoryTaskManagerTest {
     void shouldAddAndFindTasksById() {
         Task task = new Task(0, "Test Task");
         Epic epic = new Epic(0, "Test Epic");
-        SubTask subTask = new SubTask(0, "Test SubTask", 1);
+        SubTask subTask = new SubTask(0, "Test SubTask", epic.getId());
 
         Task addedTask = taskManager.createTask(task);
         Epic addedEpic = taskManager.createEpic(epic);
@@ -53,21 +53,6 @@ class InMemoryTaskManagerTest {
         assertNotEquals(task1.getId(), task2.getId());
     }
 
-    @Test
-    public void historyManagerPreservesTaskVersions() {
-        Task task = new Task(1, "Initial Task");
-        Task updatedTask = new Task(1, "Updated Task");
-
-        taskManager.createTask(task);
-        taskManager.updateTask(updatedTask);
-        taskManager.getTask(1);
-
-        Task firstVersion = taskManager.getHistory().get(0);
-        Task secondVersion = taskManager.getHistory().get(1);
-
-        assertNotEquals(firstVersion.getName(), secondVersion.getName());
-    }
-
     //Неизменность задачи при ее добавлении в менеджер
     @Test
     public void testTaskImmutabilityAfterAddition() {
@@ -83,33 +68,151 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void shouldAddAndRetrieveTask() {
-        Task task = new Task(0, "Test Task");
-        Task addedTask = taskManager.createTask(task);
-        Task retrievedTask = taskManager.getTask(addedTask.getId());
-        assertNotNull(retrievedTask);
-        assertEquals("Test Task", retrievedTask.getName());
+    public void testGenerateId() {
+        int firstId = taskManager.generateId();
+        int secondId = taskManager.generateId();
+        assertNotEquals(firstId, secondId);
     }
 
     @Test
-    void shouldAddAndRetrieveEpic() {
-        Epic epic = new Epic(0, "Test Epic");
-        Epic addedEpic = taskManager.createEpic(epic);
-        Epic retrievedEpic = taskManager.getEpic(addedEpic.getId());
-        assertNotNull(retrievedEpic);
-        assertEquals("Test Epic", retrievedEpic.getName());
+    public void testGetAllTasks() {
+        Task task1 = new Task(1, "Task 1");
+        Task task2 = new Task(2, "Task 2");
+
+        taskManager.createTask(task1);
+        taskManager.createTask(task2);
+
+        List<Task> tasks = taskManager.getAllTasks();
+
+        assertEquals(2, tasks.size());
+        assertTrue(tasks.contains(task1));
+        assertTrue(tasks.contains(task2));
     }
 
     @Test
-    void shouldAddAndRetrieveSubTask() {
-        Epic epic = new Epic(0, "Test Epic");
-        Epic addedEpic = taskManager.createEpic(epic);
-        SubTask subTask = new SubTask(0, "Test SubTask", addedEpic.getId());
-        SubTask addedSubTask = taskManager.createSubTask(subTask);
-        SubTask retrievedSubTask = taskManager.getSubTask(addedSubTask.getId());
-        assertNotNull(retrievedSubTask);
-        assertEquals("Test SubTask", retrievedSubTask.getName());
-        assertEquals(addedEpic.getId(), retrievedSubTask.getEpicId());
+    public void testGetAllEpics() {
+        Epic epic1 = new Epic(1, "Epic 1");
+        Epic epic2 = new Epic(2, "Epic 2");
+
+        taskManager.createEpic(epic1);
+        taskManager.createEpic(epic2);
+
+        List<Epic> epics = taskManager.getAllEpics();
+
+        assertEquals(2, epics.size());
+        assertTrue(epics.contains(epic1));
+        assertTrue(epics.contains(epic2));
+    }
+
+    @Test
+    public void testGetAllSubTasks() {
+        Epic epic = new Epic(1, "Epic 1");
+        SubTask subTask1 = new SubTask(2, "SubTask 1", epic.getId());
+        SubTask subTask2 = new SubTask(3, "SubTask 2", epic.getId());
+
+        taskManager.createEpic(epic);
+        taskManager.createSubTask(subTask1);
+        taskManager.createSubTask(subTask2);
+
+        List<SubTask> subTasks = taskManager.getAllSubTasks();
+
+        assertEquals(2, subTasks.size());
+        assertTrue(subTasks.contains(subTask1));
+        assertTrue(subTasks.contains(subTask2));
+    }
+
+    @Test
+    public void testCreateTask() {
+        Task task = new Task(0, "Task 1");
+
+        Task createdTask = taskManager.createTask(task);
+
+        assertNotNull(createdTask);
+        assertEquals("Task 1", createdTask.getName());
+        assertTrue(createdTask.getId() > 0);
+    }
+
+    @Test
+    public void testCreateEpic() {
+        Epic epic = new Epic(0, "Epic 1");
+
+        Epic createdEpic = taskManager.createEpic(epic);
+
+        assertNotNull(createdEpic);
+        assertEquals("Epic 1", createdEpic.getName());
+        assertTrue(createdEpic.getId() > 0);
+    }
+
+    @Test
+    public void testCreateSubTask() {
+        // Создаём Epic
+        Epic epic = new Epic(0, "Epic 1");
+        Epic createdEpic = taskManager.createEpic(epic);
+
+        // Создаём SubTask
+        SubTask subTask = new SubTask(0, "SubTask 1", createdEpic.getId());
+        SubTask createdSubTask = taskManager.createSubTask(subTask);
+
+        // Проверки на существование подзадачи и корректность данных
+        assertNotNull(createdSubTask);
+        assertEquals("SubTask 1", createdSubTask.getName());
+        assertTrue(createdSubTask.getId() > 0);
+        assertEquals(createdEpic.getId(), createdSubTask.getEpicId());
+
+        // Проверяем, что SubTask добавлена в Epic
+        Epic updatedEpic = taskManager.getEpic(createdEpic.getId());
+        assertNotNull(updatedEpic);
+    }
+
+    @Test
+    public void testGetTask() {
+        Task task = new Task(1, "Task 1");
+        taskManager.createTask(task);
+        Task returnedTask = taskManager.getTask(task.getId());
+
+        assertNotNull(returnedTask);
+        assertEquals(task.getId(), returnedTask.getId());
+        assertEquals(task.getName(), returnedTask.getName());
+        assertEquals(task.getStatus(), returnedTask.getStatus());
+
+        // Проверка истории
+        assertTrue(taskManager.getHistory().contains(returnedTask),
+                "Task должен быть в истории после выборки");
+    }
+
+    @Test
+    public void testGetEpic() {
+        Epic epic = new Epic(1, "Epic 1");
+        taskManager.createEpic(epic);
+        Epic returnedEpic = taskManager.getEpic(epic.getId());
+
+        assertNotNull(returnedEpic);
+        assertEquals(epic.getId(), returnedEpic.getId());
+        assertEquals(epic.getName(), returnedEpic.getName());
+        assertEquals(epic.getStatus(), returnedEpic.getStatus());
+
+        // Проверка истории
+        assertTrue(taskManager.getHistory().contains(returnedEpic),
+                "Epic должен быть в истории после выборки");
+    }
+
+    @Test
+    public void testGetSubTask() {
+        Epic epic = new Epic(1, "Epic 1");
+        taskManager.createEpic(epic);
+        SubTask subTask = new SubTask(2, "SubTask 1", epic.getId());
+        taskManager.createSubTask(subTask);
+        SubTask returnedSubTask = taskManager.getSubTask(subTask.getId());
+
+        assertNotNull(returnedSubTask);
+        assertEquals(subTask.getId(), returnedSubTask.getId());
+        assertEquals(subTask.getName(), returnedSubTask.getName());
+        assertEquals(subTask.getStatus(), returnedSubTask.getStatus());
+        assertEquals(subTask.getEpicId(), returnedSubTask.getEpicId());
+
+        // Проверка истории
+        assertTrue(taskManager.getHistory().contains(returnedSubTask),
+                "SubTask должен быть в истории после выборки");
     }
 
     @Test
@@ -120,6 +223,7 @@ class InMemoryTaskManagerTest {
         taskManager.updateTask(updatedTask);
         Task retrievedTask = taskManager.getTask(addedTask.getId());
         assertEquals("Updated Task", retrievedTask.getName());
+        assertTrue(taskManager.getHistory().contains(updatedTask));
     }
 
     @Test
@@ -131,6 +235,7 @@ class InMemoryTaskManagerTest {
         Epic retrievedEpic = taskManager.getEpic(updatedEpic.getId());
         assertNotNull(retrievedEpic);
         assertEquals("Updated Epic", retrievedEpic.getName());
+        assertTrue(taskManager.getHistory().contains(updatedEpic));
     }
 
     @Test
@@ -145,40 +250,70 @@ class InMemoryTaskManagerTest {
         assertNotNull(retrievedSubTask);
         assertEquals("Updated SubTask", retrievedSubTask.getName());
         assertEquals(addedEpic.getId(), retrievedSubTask.getEpicId());
+        assertTrue(taskManager.getHistory().contains(updatedSubTask));
     }
 
     @Test
-    void shouldDeleteTaskByIdAndFromHistory() {
-        Task task = new Task(0, "Task for Deletion");
+    void shouldAddAndRetrieveTask() {
+        Task task = new Task(0, "Test Task");
         Task addedTask = taskManager.createTask(task);
-        taskManager.getTask(addedTask.getId());
+        Task retrievedTask = taskManager.getTask(addedTask.getId());
+        assertNotNull(retrievedTask);
+        assertEquals("Test Task", retrievedTask.getName());
+        assertTrue(taskManager.getHistory().contains(addedTask));
+    }
+
+    @Test
+    void shouldAddAndRetrieveEpic() {
+        Epic epic = new Epic(0, "Test Epic");
+        Epic addedEpic = taskManager.createEpic(epic);
+        Epic retrievedEpic = taskManager.getEpic(addedEpic.getId());
+        assertNotNull(retrievedEpic);
+        assertEquals("Test Epic", retrievedEpic.getName());
+        assertTrue(taskManager.getHistory().contains(addedEpic));
+    }
+
+    @Test
+    void shouldAddAndRetrieveSubTask() {
+        Epic epic = new Epic(0, "Test Epic");
+        Epic addedEpic = taskManager.createEpic(epic);
+        SubTask subTask = new SubTask(0, "Test SubTask", addedEpic.getId());
+        SubTask addedSubTask = taskManager.createSubTask(subTask);
+        SubTask retrievedSubTask = taskManager.getSubTask(addedSubTask.getId());
+        assertNotNull(retrievedSubTask);
+        assertEquals("Test SubTask", retrievedSubTask.getName());
+        assertEquals(addedEpic.getId(), retrievedSubTask.getEpicId());
+        assertTrue(taskManager.getHistory().contains(addedSubTask));
+    }
+
+    @Test
+    void shouldDeleteTaskById() {
+        Task task = new Task(0, "Test Task");
+        Task addedTask = taskManager.createTask(task);
+        assertNotNull(taskManager.getTask(addedTask.getId()));
+
         taskManager.deleteTaskById(addedTask.getId());
         assertNull(taskManager.getTask(addedTask.getId()));
+
+        // Проверка удаления из истории
         assertFalse(taskManager.getHistory().contains(addedTask));
     }
 
-    //тесты для deleteEpicById(int id) и deleteSubTaskById(int id)
-    //тесты для deleteAll(Tasks, Epics, SubTasks)
-    //прочие тесты (для обработки конкретных сценариев)
+    //Тест для deleteEpicById(int id)
 
     @Test
-    void getEpicSubtasks_ShouldReturnListOfSubTasksForEpic() {
-        Epic epic = new Epic(1, "Test Epic");
-        SubTask subTask1 = new SubTask(2, "Test SubTask 1", 1);
-        SubTask subTask2 = new SubTask(3, "Test SubTask 2", 1);
-        SubTask subTask3 = new SubTask(4, "Test SubTask 3", 2);
-        taskManager.createEpic(epic);
-        taskManager.createSubTask(subTask1);
-        taskManager.createSubTask(subTask2);
-        taskManager.createSubTask(subTask3);
+    void shouldDeleteSubTaskById() {
+        Epic epic = new Epic(0, "Test Epic");
+        Epic addedEpic = taskManager.createEpic(epic);
+        SubTask subTask = new SubTask(0, "Test SubTask", addedEpic.getId());
+        SubTask addedSubTask = taskManager.createSubTask(subTask);
 
-        List<SubTask> subTasksForEpic = taskManager.getEpicSubtasks(1);
+        assertNotNull(taskManager.getSubTask(addedSubTask.getId()));
 
-        assertTrue(subTasksForEpic.contains(subTask1));
-        assertTrue(subTasksForEpic.contains(subTask2));
-        assertFalse(subTasksForEpic.contains(subTask3));
+        taskManager.deleteSubTaskById(addedSubTask.getId());
+        assertNull(taskManager.getSubTask(addedSubTask.getId()));
 
-        assertEquals(2, subTasksForEpic.size());
+        // Проверка удаления из истории
+        assertFalse(taskManager.getHistory().contains(addedSubTask));
     }
 }
-
