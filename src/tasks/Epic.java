@@ -6,9 +6,20 @@ import java.util.List;
 public class Epic extends Task {
     private final List<SubTask> subTasks = new ArrayList<>();
 
+    public Epic() {
+        super();
+        this.status = TaskStatus.NEW;
+    }
+
     public Epic(int id, String name) {
         super(id, name);
         this.status = TaskStatus.NEW;
+    }
+
+    public Epic(Epic other) {
+        super(other.getId(), other.getName());
+        this.status = other.getStatus();
+        this.subTasks.addAll(other.getSubTasks());
     }
 
     public void addSubTask(SubTask subTask) {
@@ -19,7 +30,7 @@ public class Epic extends Task {
         this.status = calculateStatus();
     }
 
-    //Обновление статуса эпика
+    // Обновление статуса эпика
     public TaskStatus calculateStatus() {
         if (subTasks.isEmpty()) {
             return TaskStatus.NEW;
@@ -50,7 +61,6 @@ public class Epic extends Task {
     }
 
     public List<SubTask> getSubTasks() {
-
         return new ArrayList<>(subTasks);
     }
 

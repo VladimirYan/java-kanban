@@ -1,14 +1,24 @@
 package manager;
 
 import tasks.*;
-
-
 import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
     private final Map<Integer, Node> historyMap = new HashMap<>();
     private Node head;
     private Node tail;
+
+    private static class Node {
+        Task task;
+        Node next;
+        Node prev;
+
+        public Node(Node prev, Task task, Node next) {
+            this.task = task;
+            this.next = next;
+            this.prev = prev;
+        }
+    }
 
     @Override
     public List<Task> getHistory() {
