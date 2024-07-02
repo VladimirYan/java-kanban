@@ -60,6 +60,11 @@ public class Epic extends Task {
         return TaskStatus.NEW;
     }
 
+    @Override
+    public TaskType getType() {
+        return TaskType.EPIC;
+    }
+
     public List<SubTask> getSubTasks() {
         return new ArrayList<>(subTasks);
     }

@@ -30,4 +30,9 @@ public class SubTask extends Task {
         }
         this.epicId = epic.getId();
     }
+
+    @Override
+    public TaskType getType() {
+        return TaskType.SUBTASK;
+    }
 }

@@ -35,10 +35,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     }
 
     public String taskToString(Task task) {
-        String epicId = task instanceof SubTask ? String.valueOf(((SubTask) task).getEpicId()) : "";
+        String epicId = task.getType() == TaskType.SUBTASK ? String.valueOf(((SubTask) task).getEpicId()) : "";
         return String.format("%d,%s,%s,%s,%s",
                 task.getId(),
-                task instanceof Epic ? TaskType.EPIC : task instanceof SubTask ? TaskType.SUBTASK : TaskType.TASK,
+                task.getType(),
                 task.getName(),
                 task.getStatus(),
                 epicId
