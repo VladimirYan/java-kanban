@@ -52,5 +52,6 @@ public class Main {
 
         // Удаление временного файла после выполнения сценария
         Files.deleteIfExists(tempFile);
+
     }
 }
