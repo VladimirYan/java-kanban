@@ -1,55 +1,57 @@
 package main;
 
-import manager.InMemoryHistoryManager;
-import tasks.Task;
-import tasks.Epic;
-import tasks.SubTask;
+import manager.*;
+import tasks.*;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class Main {
-    public static void main(String[] args) {
-        InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
+    public static void main(String[] args) throws IOException {
+        // Создание временного файла для сценария
+        Path tempFile = Files.createTempFile("user-scenario", ".csv");
 
-        // Создаем две задачи
+        // Инициализация менеджера с использованием временного файла
+        FileBackedTaskManager manager = new FileBackedTaskManager(new InMemoryHistoryManager(), tempFile.toFile());
+
+        // Создание задач, эпиков и подзадач
         Task task1 = new Task(1, "Task 1");
         Task task2 = new Task(2, "Task 2");
-
-        // Создаем эпик с тремя подзадачами
         Epic epic1 = new Epic(3, "Epic 1");
-        SubTask subtask1 = new SubTask(4, "Subtask 1", 3);
-        SubTask subtask2 = new SubTask(5, "Subtask 2", 3);
-        SubTask subtask3 = new SubTask(6, "Subtask 3", 3);
+        Epic epic2 = new Epic(4, "Epic 2");
+        SubTask subTask1 = new SubTask(5, "SubTask 1", epic1.getId());
+        SubTask subTask2 = new SubTask(6, "SubTask 2", epic1.getId());
 
-        // Добавляем подзадачи в эпик
-        epic1.addSubTask(subtask1);
-        epic1.addSubTask(subtask2);
-        epic1.addSubTask(subtask3);
+        // Добавление задач, эпиков и подзадач в менеджер
+        manager.createTask(task1);
+        manager.createTask(task2);
+        manager.createEpic(epic1);
+        manager.createEpic(epic2);
+        manager.createSubTask(subTask1);
+        manager.createSubTask(subTask2);
 
-        // Создаем эпик без подзадач
-        Epic epic2 = new Epic(7, "Epic 2");
+        // Сохранение задач в файл
+        manager.save();
 
-        // Добавляем задачи в историю в разном порядке
-        historyManager.add(task1);
-        historyManager.add(epic1);
-        historyManager.add(task2);
-        historyManager.add(subtask1);
-        historyManager.add(subtask2);
-        historyManager.add(subtask3);
-        historyManager.add(epic2);
+        // Создание нового менеджера из того же файла
+        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile.toFile());
 
-        printHistory(historyManager, "Начальная история:");
+        // Проверка существования задач, эпиков и подзадач в новом менеджере
+        assert loadedManager.getAllTasks().size() == 2;
+        assert loadedManager.getAllEpics().size() == 2;
+        assert loadedManager.getAllSubTasks().size() == 2;
 
-        // Удаляем задачу из истории и проверяем
-        historyManager.remove(task2.getId());
-        printHistory(historyManager, "Истори после удаления task2:");
+        // Проверка, совпадают ли ID исходных и загруженных задач, эпиков и подзадач
+        assert task1.getId() == loadedManager.getTask(task1.getId()).getId();
+        assert task2.getId() == loadedManager.getTask(task2.getId()).getId();
+        assert epic1.getId() == loadedManager.getEpic(epic1.getId()).getId();
+        assert epic2.getId() == loadedManager.getEpic(epic2.getId()).getId();
+        assert subTask1.getId() == loadedManager.getSubTask(subTask1.getId()).getId();
+        assert subTask2.getId() == loadedManager.getSubTask(subTask2.getId()).getId();
 
-        // Удаляем эпик с тремя подзадачами и проверяем
-        historyManager.remove(epic1.getId());
-        printHistory(historyManager, "История после удаления epic1 и его подзадач:");
-    }
+        // Удаление временного файла после выполнения сценария
+        Files.deleteIfExists(tempFile);
 
-    private static void printHistory(InMemoryHistoryManager historyManager, String message) {
-        System.out.println(message);
-        historyManager.getHistory().forEach(task -> System.out.println(task.getId() + " - " + task.getName()));
-        System.out.println();
     }
 }
