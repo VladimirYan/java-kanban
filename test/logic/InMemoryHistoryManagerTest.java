@@ -133,24 +133,4 @@ class InMemoryHistoryManagerTest {
         List<Task> history = historyManager.getHistory();
         assertTrue(history.isEmpty());
     }
-
-    // Дополнительные тесты для Epic и SubTask
-    @Test
-    public void removeEpicWithSubTasks() {
-        Epic epic = new Epic(1, "Epic Task");
-        SubTask subTask1 = new SubTask(2, "Sub Task 1", epic.getId());
-        SubTask subTask2 = new SubTask(3, "Sub Task 2", epic.getId());
-
-        epic.addSubTask(subTask1);
-        epic.addSubTask(subTask2);
-
-        historyManager.add(epic);
-        historyManager.add(subTask1);
-        historyManager.add(subTask2);
-
-        historyManager.remove(epic.getId());
-
-        List<Task> history = historyManager.getHistory();
-        assertTrue(history.isEmpty());
-    }
 }

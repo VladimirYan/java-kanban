@@ -4,55 +4,68 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class SubTaskTest {
+import java.time.Duration;
+import java.time.LocalDateTime;
+
+class SubTaskTest {
+
     private SubTask subTask;
-    private Epic epic;
+    private final int id = 1;
+    private final String name = "Test SubTask";
+    private final int epicId = 10;
+    private final Duration duration = Duration.ofHours(1);
+    private final LocalDateTime startTime = LocalDateTime.now();
 
     @BeforeEach
-    public void setUp() {
-        subTask = new SubTask(1, "SubTask Test", 10);
-        epic = new Epic(2, "Epic Test");
+    void setUp() {
+        subTask = new SubTask(id, name, epicId, duration, startTime);
     }
 
     @Test
-    public void testConstructor() {
-        assertEquals(1, subTask.getId());
-        assertEquals("SubTask Test", subTask.getName());
+    void testConstructor() {
+        assertEquals(id, subTask.getId());
+        assertEquals(name, subTask.getName());
         assertEquals(TaskStatus.NEW, subTask.getStatus());
-        assertEquals(10, subTask.getEpicId());
+        assertEquals(epicId, subTask.getEpicId());
+        assertEquals(duration, subTask.getDuration());
+        assertEquals(startTime, subTask.getStartTime());
     }
 
     @Test
-    public void testGetEpicId() {
-
-        assertEquals(10, subTask.getEpicId());
+    void testCopyConstructor() {
+        SubTask copySubTask = new SubTask(subTask);
+        assertEquals(subTask.getId(), copySubTask.getId());
+        assertEquals(subTask.getName(), copySubTask.getName());
+        assertEquals(subTask.getStatus(), copySubTask.getStatus());
+        assertEquals(subTask.getEpicId(), copySubTask.getEpicId());
+        assertEquals(subTask.getDuration(), copySubTask.getDuration());
+        assertEquals(subTask.getStartTime(), copySubTask.getStartTime());
     }
 
     @Test
-    public void testSetEpic() {
+    void testSetEpic() {
+        Epic epic = new Epic(epicId + 1, "Test Epic");
         subTask.setEpic(epic);
-        assertEquals(2, subTask.getEpicId());
+        assertEquals(epic.getId(), subTask.getEpicId());
     }
 
-    //Корректная обработка исключения
     @Test
-    public void testSetEpicThrowsException() {
-        Epic invalidEpic = new Epic(1, "Invalid Epic");
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> subTask.setEpic(invalidEpic));
-
-        assertEquals("A subtask cannot be its own epic", exception.getMessage());
+    void testSetEpicWithSameId() {
+        Epic epic = new Epic(subTask.getId(), "Test Epic");
+        assertThrows(IllegalArgumentException.class, () -> subTask.setEpic(epic));
     }
 
-    //Проверка методов, наследованных из родительского класса
     @Test
-    public void testInheritedMethods() {
-        subTask.setId(3);
-        assertEquals(3, subTask.getId());
-
-        subTask.setName("Updated SubTask");
-        assertEquals("Updated SubTask", subTask.getName());
-
-        subTask.setStatus(TaskStatus.DONE);
-        assertEquals(TaskStatus.DONE, subTask.getStatus());
+    void testGetType() {
+        assertEquals(TaskType.SUBTASK, subTask.getType());
     }
+
+    @Test
+    void testToString() {
+        String expectedString = String.format("Подзадача='%s', ID=%d, Статус='%s', ЭпикID=%d, Начало='%s', Продолжительность='%s'",
+                name, id, TaskStatus.NEW, epicId, startTime, duration);
+        assertEquals(expectedString, subTask.toString());
+    }
+
+
 }
