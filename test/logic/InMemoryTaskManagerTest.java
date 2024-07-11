@@ -390,3 +390,6 @@ class InMemoryTaskManagerTest {
         assertTrue(taskManager.isTaskInvalid(task2), "Задача должна считаться пересекающейся, если заканчивается в момент начала другой задачи");
     }
 }
+
+
+
