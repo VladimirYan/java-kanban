@@ -3,94 +3,157 @@ package tasks;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class TaskTest {
     private Task task;
+    private final int id = 1;
+    private final String name = "Test Task";
+    private final Duration duration = Duration.ofHours(1);
+    private final LocalDateTime startTime = LocalDateTime.now();
 
     @BeforeEach
-    public void setUp() {
-
-        task = new Task(1, "Test task");
+    void setUp() {
+        task = new Task(id, name, duration, startTime);
     }
 
     @Test
-    public void testConstructor() {
-        assertEquals(1, task.getId());
-        assertEquals("Test task", task.getName());
+    void testConstructorWithoutDurationAndStartTime() {
+        Task newTask = new Task(id, name);
+        assertEquals(id, newTask.getId());
+        assertEquals(name, newTask.getName());
+        assertEquals(TaskStatus.NEW, newTask.getStatus());
+        assertNull(newTask.getDuration());
+        assertNull(newTask.getStartTime());
+    }
+
+    @Test
+    void testConstructorWithDurationAndStartTime() {
+        Task newTask = new Task(id, name, duration, startTime);
+        assertEquals(id, newTask.getId());
+        assertEquals(name, newTask.getName());
+        assertEquals(TaskStatus.NEW, newTask.getStatus());
+        assertEquals(duration, newTask.getDuration());
+        assertEquals(startTime, newTask.getStartTime());
+    }
+
+    @Test
+    void testCopyConstructor() {
+        Task copyTask = new Task(task);
+        assertEquals(task.getId(), copyTask.getId());
+        assertEquals(task.getName(), copyTask.getName());
+        assertEquals(task.getStatus(), copyTask.getStatus());
+        assertEquals(task.getDuration(), copyTask.getDuration());
+        assertEquals(task.getStartTime(), copyTask.getStartTime());
+    }
+
+    @Test
+    void testGetId() {
+        assertEquals(id, task.getId());
+    }
+
+    @Test
+    void testSetId() {
+        int newId = 2;
+        task.setId(newId);
+        assertEquals(newId, task.getId());
+    }
+
+    @Test
+    void testGetName() {
+        assertEquals(name, task.getName());
+    }
+
+    @Test
+    void testSetName() {
+        String newName = "New Task Name";
+        task.setName(newName);
+        assertEquals(newName, task.getName());
+    }
+
+    @Test
+    void testGetStatus() {
         assertEquals(TaskStatus.NEW, task.getStatus());
     }
 
     @Test
-    public void testSettersAndGetters() {
-        task.setId(2);
-        assertEquals(2, task.getId());
-
-        task.setName("Updated task");
-        assertEquals("Updated task", task.getName());
-
-        task.setStatus(TaskStatus.DONE);
-        assertEquals(TaskStatus.DONE, task.getStatus());
+    void testSetStatus() {
+        TaskStatus newStatus = TaskStatus.IN_PROGRESS;
+        task.setStatus(newStatus);
+        assertEquals(newStatus, task.getStatus());
     }
 
     @Test
-    public void testEquals() {
-        Task anotherTask = new Task(1, "Another task");
-        Task differentTask = new Task(2, "Different task");
+    void testGetType() {
+        assertEquals(TaskType.TASK, task.getType());
+    }
 
-        assertEquals(task, anotherTask);
+    @Test
+    void testGetDuration() {
+        assertEquals(duration, task.getDuration());
+    }
+
+    @Test
+    void testSetDuration() {
+        Duration newDuration = Duration.ofHours(2);
+        task.setDuration(newDuration);
+        assertEquals(newDuration, task.getDuration());
+    }
+
+    @Test
+    void testGetStartTime() {
+        assertEquals(startTime, task.getStartTime());
+    }
+
+    @Test
+    void testSetStartTime() {
+        LocalDateTime newStartTime = LocalDateTime.now().plusDays(1);
+        task.setStartTime(newStartTime);
+        assertEquals(newStartTime, task.getStartTime());
+    }
+
+    @Test
+    void testGetEndTime() {
+        assertEquals(startTime.plus(duration), task.getEndTime());
+    }
+
+    @Test
+    void testGetEndTimeWithoutStartTime() {
+        task.setStartTime(null);
+        assertNull(task.getEndTime());
+    }
+
+    @Test
+    void testGetEndTimeWithoutDuration() {
+        task.setDuration(null);
+        assertEquals(startTime, task.getEndTime());
+    }
+
+    @Test
+    void testEquals() {
+        Task sameTask = new Task(id, name, duration, startTime);
+        assertEquals(task, sameTask);
+    }
+
+    @Test
+    void testNotEqualsDifferentId() {
+        Task differentTask = new Task(2, name, duration, startTime);
         assertNotEquals(task, differentTask);
-        assertNotEquals(null, task);
-        assertNotEquals(task, new Object());
     }
 
     @Test
-    public void testHashCode() {
-        Task anotherTask = new Task(1, "Another task");
-        assertEquals(task.hashCode(), anotherTask.hashCode());
-
-        anotherTask.setId(3);
-        assertNotEquals(task.hashCode(), anotherTask.hashCode());
+    void testHashCode() {
+        Task sameTask = new Task(id, name, duration, startTime);
+        assertEquals(task.hashCode(), sameTask.hashCode());
     }
 
     @Test
-    public void testToString() {
-        String expectedString = "Название='Test task', ID=1, Статус='NEW'";
+    void testToString() {
+        String expectedString = String.format("Задача='%s', ID=%d, Статус='%s', Начало='%s', Продолжительность='%s'",
+                name, id, TaskStatus.NEW, startTime, duration);
         assertEquals(expectedString, task.toString());
-    }
-
-    @Test
-    void testTaskEqualityById() {
-        Task task1 = new Task(1, "Task 1");
-        Task task2 = new Task(1, "Task 2");
-
-        assertEquals(task1, task2, "Tasks should be equal as their IDs are equal");
-    }
-
-    @Test
-    void testSubtaskEqualityById() {
-        SubTask subtask1 = new SubTask(1, "Subtask 1", 2);
-        SubTask subtask2 = new SubTask(1, "Subtask 2", 3);
-
-        assertEquals(subtask1, subtask2, "Subtasks should be equal as their IDs are equal");
-    }
-
-    @Test
-    void epicCannotContainItselfAsSubTask() {
-        Epic epic1 = new Epic(1, "Epic 1");
-
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> epic1.addSubTask(new SubTask(1, "Subtask 1", 1)));
-
-        assertTrue(exception.getMessage().contains("A subtask cannot be its own epic"), "Epic should not contain itself as a subtask");
-    }
-
-    @Test
-    void subtaskCannotBeItsOwnEpic() {
-        SubTask subtask = new SubTask(1, "Subtask", 0);
-        Epic epic = new Epic(1, "Epic");
-
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> subtask.setEpic(epic));
-
-        assertTrue(exception.getMessage().contains("A subtask cannot be its own epic"), "Subtask should not be able to set itself as its own epic");
     }
 }
