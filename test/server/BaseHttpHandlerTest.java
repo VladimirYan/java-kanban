@@ -47,7 +47,6 @@ public class BaseHttpHandlerTest {
 
         handler.sendNotFound(exchange);
 
-        // Используем anyLong() для большей гибкости в типе данных
         verify(exchange).sendResponseHeaders(eq(404), anyLong());
         assertEquals("{\"error\":\"Resource not found\"}", os.toString());
 
@@ -63,7 +62,6 @@ public class BaseHttpHandlerTest {
 
         handler.sendHasInteractions(exchange);
 
-        // Используем anyLong() для большей гибкости в типе данных
         verify(exchange).sendResponseHeaders(eq(406), anyLong());
         assertEquals("{\"error\":\"Task overlaps with existing tasks\"}", os.toString());
 
