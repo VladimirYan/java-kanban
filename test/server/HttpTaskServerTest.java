@@ -4,11 +4,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import manager.Managers;
 import manager.TaskManager;
-import server.handler.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.gson.DurationTypeAdapter;
+import server.gson.LocalDateTimeTypeAdapter;
+import server.handler.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,8 +19,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.Duration;
+import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HttpTaskServerTest {
     private HttpTaskServer server;
@@ -45,6 +47,7 @@ public class HttpTaskServerTest {
 
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(Duration.class, new DurationTypeAdapter())
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
                 .create();
 
         TaskManager taskManager = Managers.getDefaultInMemoryManager();

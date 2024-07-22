@@ -5,16 +5,28 @@ import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpServer;
 import manager.Managers;
 import manager.TaskManager;
+import server.gson.LocalDateTimeTypeAdapter;
 import server.handler.*;
 import server.gson.DurationTypeAdapter;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class HttpTaskServer {
+
+    /*
+    Ранее в тестах я использовал mock-объекты
+    Разными способами загружал их в проект
+    через Project Structure -> Libraries, отдельно загружал mockito.core from Maven
+    указывал необходимые зависимости в Modules
+    пытался внести корректировки в .iml
+    во всех случаях GitHub их не видит
+     */
+
     private static final int PORT = 8080;
     private static final Logger logger = Logger.getLogger(HttpTaskServer.class.getName());
     private final HttpServer server;
@@ -24,6 +36,7 @@ public class HttpTaskServer {
         TaskManager taskManager = Managers.getDefaultInMemoryManager();
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(Duration.class, new DurationTypeAdapter())
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
                 .create();
         server.createContext("/tasks", new TaskHandler(taskManager, gson));
         server.createContext("/subtasks", new SubTaskHandler(taskManager, gson));
