@@ -27,11 +27,12 @@
     <orderEntry type="library" exported="" name="gson-2.11.0" level="project" />
     <orderEntry type="library" scope="TEST" name="httpcore5-5.1.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="mockito.core" level="project">
-      <library name="Mockito4.1.0">
+      <library name="Mockito">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/mockito-core-4.1.0.jar!/" />
-          <root url="jar://$MODULE_DIR$/lib/mockito-inline-4.1.0.jar!/" />
-          <root url="jar://$MODULE_DIR$/lib/objenesis-3.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/byte-buddy-1.14.12.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/byte-buddy-agent-1.14.12.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/mockito-core-5.11.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/objenesis-3.3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
