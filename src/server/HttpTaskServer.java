@@ -18,15 +18,6 @@ import java.util.logging.Logger;
 
 public class HttpTaskServer {
 
-    /*
-    Ранее в тестах я использовал mock-объекты
-    Разными способами загружал их в проект
-    через Project Structure -> Libraries, отдельно загружал mockito.core from Maven
-    указывал необходимые зависимости в Modules
-    пытался внести корректировки в .iml
-    во всех случаях GitHub их не видит
-     */
-
     private static final int PORT = 8080;
     private static final Logger logger = Logger.getLogger(HttpTaskServer.class.getName());
     private final HttpServer server;

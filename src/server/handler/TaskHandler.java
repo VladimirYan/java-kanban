@@ -23,40 +23,54 @@ public class TaskHandler extends BaseHttpHandler {
     }
 
     @Override
-    public void handle(HttpExchange exchange) throws IOException {
+    protected void processGet(HttpExchange exchange) throws IOException {
+        handleGetTasks(exchange);
+    }
+
+    @Override
+    protected void processPost(HttpExchange exchange) throws IOException {
+        handlePostTask(exchange);
+    }
+
+    @Override
+    protected void processDelete(HttpExchange exchange) throws IOException {
+        handleDeleteTask(exchange);
+    }
+
+    private void handleGetTasks(HttpExchange exchange) throws IOException {
         try {
-            String method = exchange.getRequestMethod();
-            switch (method) {
-                case "GET" -> handleGetTasks(exchange);
-                case "POST" -> handlePostTask(exchange);
-                case "DELETE" -> handleDeleteTask(exchange);
-                default -> sendNotFound(exchange);
-            }
+            List<Task> tasks = taskManager.getAllTasks();
+            String response = gson.toJson(tasks);
+            sendText(exchange, 200, response);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Internal server error", e);
             sendText(exchange, 500, "{\"error\":\"Internal server error\"}");
         }
     }
 
-    private void handleGetTasks(HttpExchange exchange) throws IOException {
-        List<Task> tasks = taskManager.getAllTasks();
-        String response = gson.toJson(tasks);
-        sendText(exchange, 200, response);
-    }
-
     private void handlePostTask(HttpExchange exchange) throws IOException {
-        String requestBody = readRequestBody(exchange);
-        Task task = gson.fromJson(requestBody, Task.class);
-        Task createdTask = taskManager.createTask(task);
-        respondToCreateTask(exchange, createdTask);
+        try {
+            String requestBody = readRequestBody(exchange);
+            Task task = gson.fromJson(requestBody, Task.class);
+            Task createdTask = taskManager.createTask(task);
+            respondToCreateTask(exchange, createdTask);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Internal server error", e);
+            sendText(exchange, 500, "{\"error\":\"Internal server error\"}");
+        }
     }
 
     private void handleDeleteTask(HttpExchange exchange) throws IOException {
-        String query = exchange.getRequestURI().getQuery();
-        if (query != null && query.startsWith("id=")) {
-            deleteTaskById(exchange, query.split("=")[1]);
-        } else {
-            deleteAllTasks(exchange);
+        try {
+            String query = exchange.getRequestURI().getQuery();
+            if (query != null && query.startsWith("id=")) {
+                deleteTaskById(exchange, query.split("=")[1]);
+            } else {
+                deleteAllTasks(exchange);
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Internal server error", e);
+            sendText(exchange, 500, "{\"error\":\"Internal server error\"}");
         }
     }
 
@@ -85,11 +99,6 @@ public class TaskHandler extends BaseHttpHandler {
     private void deleteAllTasks(HttpExchange exchange) throws IOException {
         taskManager.deleteAllTasks();
         sendText(exchange, 200, "{\"message\":\"All tasks deleted successfully\"}");
-    }
-
-    protected void sendNotFound(HttpExchange exchange) throws IOException {
-        exchange.sendResponseHeaders(404, 0);
-        exchange.close();
     }
 }
 
